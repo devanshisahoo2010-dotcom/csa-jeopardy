@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AP CSA Jeopardy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --royal: #1a3a6b;
+    --blue: #1e4fa0;
+    --mid: #2563c8;
+    --bright: #3b82f6;
+    --sky: #60a5fa;
+    --pale: #bfdbfe;
+    --white: #f0f6ff;
+    --gold: #fbbf24;
+    --gold-dark: #d97706;
+    --silver: #94a3b8;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --glow: 0 0 20px rgba(59,130,246,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(30,79,160,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(26,58,107,0.4) 0%, transparent 50%);
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 18px 20px 10px;
+    position: relative;
+    border-bottom: 2px solid var(--mid);
+    background: linear-gradient(180deg, rgba(26,58,107,0.8) 0%, transparent 100%);
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-shadow: 0 0 30px rgba(59,130,246,0.7), 0 2px 0 var(--navy);
+    line-height: 1;
+  }
+
+  header h1 span { color: var(--gold); }
+
+  header p {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: var(--sky);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* SCORES */
+  .scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: rgba(10,22,40,0.6);
+    border-bottom: 1px solid rgba(59,130,246,0.2);
+    flex-wrap: wrap;
+  }
+
+  .team-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(30,79,160,0.4), rgba(10,22,40,0.6));
+    border: 1px solid var(--mid);
+    border-radius: 10px;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 140px;
+  }
+
+  .team-score.active {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(30,79,160,0.4));
+    box-shadow: 0 0 18px rgba(251,191,36,0.3);
+  }
+
+  .team-score:hover { transform: translateY(-2px); }
+
+  .team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 2px;
+  }
+
+  .team-score.active .team-name { color: var(--gold); }
+
+  .score-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .team-score.active .score-value { color: var(--gold); }
+
+  .active-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 2px;
+    font-weight: 600;
+  }
+
+  /* BOARD */
+  .board-wrap {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  /* Category headers */
+  .cat-header {
+    background: linear-gradient(180deg, var(--royal) 0%, var(--blue) 100%);
+    border: 1px solid var(--mid);
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1.2;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  /* Question cells */
+  .cell {
+    background: linear-gradient(180deg, var(--blue) 0%, var(--royal) 100%);
+    border: 1px solid var(--mid);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 70px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cell:hover:not(.used) {
+    transform: scale(1.04);
+    border-color: var(--bright);
+    box-shadow: var(--glow), 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 2;
+  }
+
+  .cell .points {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    color: var(--gold);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    letter-spacing: 0.02em;
+  }
+
+  .cell.used {
+    background: rgba(10,22,40,0.5);
+    border-color: rgba(30,79,160,0.2);
+    cursor: default;
+  }
+
+  .cell.used .points { opacity: 0; }
+
+  /* MODAL */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,10,20,0.88);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(6px);
+  }
+
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: linear-gradient(145deg, var(--royal) 0%, var(--navy) 100%);
+    border: 2px solid var(--mid);
+    border-radius: 16px;
+    padding: 36px 40px;
+    max-width: 680px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(59,130,246,0.25), 0 30px 80px rgba(0,0,0,0.7);
+    position: relative;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-category {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 6px;
+  }
+
+  .modal-points {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(251,191,36,0.4);
+  }
+
+  .modal-question {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--white);
+    margin-bottom: 28px;
+    border-left: 3px solid var(--bright);
+    padding-left: 16px;
+  }
+
+  /* Code blocks in questions */
+  .modal-question code {
+    background: rgba(10,22,40,0.7);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: var(--sky);
+  }
+
+  .modal-question pre {
+    background: rgba(10,22,40,0.7);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--sky);
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+
+  .reveal-btn {
+    background: none;
+    border: 1px solid var(--mid);
+    color: var(--sky);
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+  }
+
+  .reveal-btn:hover { background: rgba(59,130,246,0.15); border-color: var(--bright); }
+
+  .modal-answer {
+    display: none;
+    background: rgba(10,22,40,0.6);
+    border: 1px solid var(--bright);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    color: var(--pale);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .modal-answer.show { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .modal-answer strong { color: var(--white); }
+  .modal-answer code {
+    background: rgba(10,22,40,0.7);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    color: var(--gold);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 11px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .btn-correct {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
+  }
+  .btn-correct:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(34,197,94,0.4); }
+
+  .btn-wrong {
+    background: linear-gradient(135deg, #b91c1c, #ef4444);
+    color: white;
+  }
+  .btn-wrong:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(239,68,68,0.4); }
+
+  .btn-skip {
+    background: transparent;
+    border: 1px solid var(--silver);
+    color: var(--silver);
+  }
+  .btn-skip:hover { background: rgba(148,163,184,0.1); }
+
+  .team-picker {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 10px;
+  }
+
+  .team-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .team-btn {
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--mid);
+    background: transparent;
+    color: var(--pale);
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .team-btn.selected {
+    background: var(--mid);
+    border-color: var(--bright);
+    color: var(--white);
+  }
+
+  .close-modal {
+    position: absolute;
+    top: 14px; right: 18px;
+    background: none;
+    border: none;
+    color: var(--silver);
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .close-modal:hover { color: var(--white); }
+
+  /* WINNER MODAL */
+  .winner-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,10,20,0.92);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+  }
+
+  .winner-overlay.show { display: flex; }
+
+  .winner-modal {
+    background: linear-gradient(145deg, var(--royal), var(--navy));
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 50px 60px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(251,191,36,0.3), 0 40px 100px rgba(0,0,0,0.8);
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .trophy { font-size: 4rem; margin-bottom: 16px; }
+
+  .winner-modal h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(251,191,36,0.5);
+    margin-bottom: 8px;
+  }
+
+  .winner-modal p {
+    color: var(--sky);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+
+  .reset-btn {
+    background: linear-gradient(135deg, var(--mid), var(--bright));
+    border: none;
+    color: white;
+    padding: 14px 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(59,130,246,0.5); }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .board { gap: 4px; }
+    .cat-header { font-size: 0.55rem; min-height: 46px; padding: 6px 4px; }
+    .cell { min-height: 52px; }
+    .cell .points { font-size: 1.1rem; }
+    .modal { padding: 24px 20px; }
+    .modal-points { font-size: 2rem; }
+    .modal-question { font-size: 1rem; }
+    .winner-modal { padding: 30px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AP <span>CSA</span> Jeopardy</h1>
+  <p>Advanced Placement Computer Science A</p>
+</header>
+
+<div class="scoreboard" id="scoreboard"></div>
+
+<div class="board-wrap">
+  <div class="board" id="board"></div>
+</div>
+
+<!-- Question Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="close-modal" id="closeModal">✕</button>
+    <div class="modal-category" id="modalCat"></div>
+    <div class="modal-points" id="modalPts"></div>
+    <div class="modal-question" id="modalQ"></div>
+    <button class="reveal-btn" id="revealBtn">Reveal Answer</button>
+    <div class="modal-answer" id="modalA"></div>
+    <div class="team-picker">Award points to:</div>
+    <div class="team-btns" id="teamBtns"></div>
+    <div class="modal-actions">
+      <button class="btn btn-correct" id="btnCorrect">✓ Correct</button>
+      <button class="btn btn-wrong" id="btnWrong">✗ Wrong (–pts)</button>
+      <button class="btn btn-skip" id="btnSkip">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- Winner Modal -->
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-modal">
+    <div class="trophy">🏆</div>
+    <h2 id="winnerName">Team 1</h2>
+    <p id="winnerScore">wins with 0 points!</p>
+    <button class="reset-btn" onclick="resetGame()">Play Again</button>
+  </div>
+</div>
+
+<script>
+const TEAMS = ['Team 1', 'Team 2', 'Team 3'];
+
+const CATEGORIES = [
+  'Sorting & Searching',
+  '2D Arrays & ArrayLists',
+  'Methods & Control Structures',
+  'Loops',
+  'Recursion',
+  'String & Math Classes'
+];
+
+// 6 categories × 6 point values (100–600)
+const QUESTIONS = [
+  // === SORTING & SEARCHING ===
+  [
+    {
+      q: `What is the time complexity of <b>linear search</b> in the worst case?`,
+      a: `<strong>O(n)</strong> — Linear search scans each element one by one, so in the worst case it checks all <em>n</em> elements.`
+    },
+    {
+      q: `In <b>selection sort</b>, what operation is performed in each pass through the array?`,
+      a: `<strong>Find the minimum element</strong> in the unsorted portion and <strong>swap it</strong> into its correct position at the front.`
+    },
+    {
+      q: `What precondition must be met before applying <b>binary search</b>?`,
+      a: `The array must be <strong>sorted in ascending (or descending) order</strong>. Binary search relies on eliminating half the search space at each step.`
+    },
+    {
+      q: `What is the worst-case time complexity of <b>insertion sort</b>, and when does it occur?`,
+      a: `<strong>O(n²)</strong> — occurs when the input array is in <strong>reverse sorted order</strong>, requiring maximum shifts at each step.`
+    },
+    {
+      q: `Describe the <b>merge sort</b> algorithm at a high level and state its time complexity.`,
+      a: `Merge sort <strong>divides</strong> the array in half recursively until single elements remain, then <strong>merges</strong> sorted halves back together. Time complexity: <strong>O(n log n)</strong> in all cases.`
+    },
+    {
+      q: `Given a sorted array <code>[2, 5, 8, 12, 16, 23, 38, 56]</code>, trace through <b>binary search</b> looking for 23. List each mid index checked (0-based).`,
+      a: `Array length = 8.<br><strong>Step 1:</strong> low=0, high=7 → mid=3 → arr[3]=12 &lt; 23 → search right<br><strong>Step 2:</strong> low=4, high=7 → mid=5 → arr[5]=23 ✓ Found at index 5.<br>Mid indices checked: <strong>3, 5</strong>`
+    }
+  ],
+
+  // === 2D ARRAYS & ARRAYLISTS ===
+  [
+    {
+      q: `How do you declare a 2D array in Java with 3 rows and 4 columns of integers?`,
+      a: `<code>int[][] arr = new int[3][4];</code><br>This creates a 2D array with 3 rows and 4 columns, initialized to 0.`
+    },
+    {
+      q: `What method adds an element to the <b>end</b> of an ArrayList, and what method retrieves an element by index?`,
+      a: `<strong>Add:</strong> <code>list.add(element)</code><br><strong>Get:</strong> <code>list.get(index)</code>`
+    },
+    {
+      q: `What is the output of the following code?<pre>int[][] m = {{1,2},{3,4},{5,6}};
+System.out.println(m.length + " " + m[0].length);</pre>`,
+      a: `<strong>3 2</strong><br><code>m.length</code> = number of rows = 3<br><code>m[0].length</code> = number of columns = 2`
+    },
+    {
+      q: `Explain why you <b>cannot</b> use a standard for-each loop to modify elements of an ArrayList during iteration, and what should be used instead.`,
+      a: `A for-each loop provides a <strong>copy</strong> of each element — modifying the loop variable doesn't affect the list. Also, <strong>removing</strong> elements during for-each throws <code>ConcurrentModificationException</code>.<br>Use an <strong>index-based for loop iterating backwards</strong>, or <code>Iterator.remove()</code>.`
+    },
+    {
+      q: `Write a method that sums all elements in a 2D int array.`,
+      a: `<pre>public int sum2D(int[][] arr) {
+  int total = 0;
+  for (int[] row : arr)
+    for (int val : row)
+      total += val;
+  return total;
+}</pre>`
+    },
+    {
+      q: `An ArrayList contains <code>[10, 20, 30, 40, 50]</code>. What is the state of the list after:<pre>list.remove(1);
+list.add(1, 99);
+list.set(3, 77);</pre>`,
+      a: `<strong>Step 1</strong> <code>remove(1)</code>: removes index 1 → <code>[10, 30, 40, 50]</code><br><strong>Step 2</strong> <code>add(1, 99)</code>: inserts 99 at index 1 → <code>[10, 99, 30, 40, 50]</code><br><strong>Step 3</strong> <code>set(3, 77)</code>: replaces index 3 → <code>[10, 99, 30, <b>77</b>, 50]</code>`
+    }
+  ],
+
+  // === METHODS & CONTROL STRUCTURES ===
+  [
+    {
+      q: `What is the difference between a <b>void</b> method and a method with a <b>return type</b>?`,
+      a: `A <strong>void</strong> method performs actions but does <strong>not return a value</strong>. A method with a return type (e.g., <code>int</code>, <code>String</code>) computes and <strong>returns a value</strong> to the caller using the <code>return</code> keyword.`
+    },
+    {
+      q: `What is the output?<pre>int x = 7;
+if (x > 10)
+  System.out.println("A");
+else if (x > 5)
+  System.out.println("B");
+else
+  System.out.println("C");</pre>`,
+      a: `<strong>B</strong><br>7 is not &gt; 10, but 7 <em>is</em> &gt; 5, so the second branch executes.`
+    },
+    {
+      q: `What is <b>method overloading</b>? Give an example signature pair.`,
+      a: `Method overloading = same method name, <strong>different parameter lists</strong> (different types or count).<br>Example:<br><code>int add(int a, int b)</code><br><code>double add(double a, double b)</code><br>Java selects the correct version based on argument types at compile time.`
+    },
+    {
+      q: `Explain the difference between <b>pass by value</b> for primitives vs. object references in Java method calls.`,
+      a: `Java always passes by <strong>value</strong>.<br>• <strong>Primitives</strong>: a copy of the value is passed; changes inside the method don't affect the original.<br>• <strong>Object references</strong>: a copy of the <em>reference</em> (address) is passed; the method can mutate the object's fields, but cannot change which object the caller's variable points to.`
+    },
+    {
+      q: `What does <code>static</code> mean on a method, and how is it called differently than an instance method?`,
+      a: `A <code>static</code> method belongs to the <strong>class</strong>, not an instance. It can be called without creating an object:<br><code>ClassName.methodName()</code><br>vs. an instance method which requires an object:<br><code>obj.methodName()</code><br>Static methods cannot access instance variables directly.`
+    },
+    {
+      q: `What is the output of this program?<pre>public static int mystery(int n) {
+  if (n == 0) return 0;
+  return (n % 2) + 10 * mystery(n / 2);
+}
+System.out.println(mystery(13));</pre>`,
+      a: `This converts 13 to binary:<br>13 / 2 = 6 r <strong>1</strong><br>6 / 2 = 3 r <strong>0</strong><br>3 / 2 = 1 r <strong>1</strong><br>1 / 2 = 0 r <strong>1</strong><br>Result: <code>10 * mystery(6) + 1</code> → builds up: <strong>1101</strong><br>Output: <strong>1101</strong>`
+    }
+  ],
+
+  // === LOOPS ===
+  [
+    {
+      q: `What is the difference between a <b>while</b> loop and a <b>do-while</b> loop?`,
+      a: `A <code>while</code> loop checks the condition <strong>before</strong> each iteration — it may execute <strong>zero times</strong>.<br>A <code>do-while</code> loop checks the condition <strong>after</strong> each iteration — it always executes <strong>at least once</strong>.`
+    },
+    {
+      q: `How many times does this loop execute?<pre>for (int i = 0; i &lt; 5; i += 2) {
+  System.out.print(i + " ");
+}</pre>`,
+      a: `<strong>3 times</strong> — printing <code>0 2 4</code><br>i = 0 (0 &lt; 5 ✓), i = 2 (2 &lt; 5 ✓), i = 4 (4 &lt; 5 ✓), i = 6 (6 &lt; 5 ✗) → stop`
+    },
+    {
+      q: `What is the difference between <code>break</code> and <code>continue</code> inside a loop?`,
+      a: `<code><strong>break</strong></code>: immediately <strong>exits</strong> the loop entirely.<br><code><strong>continue</strong></code>: skips the rest of the current iteration and moves to the <strong>next iteration</strong> (re-evaluating the condition).`
+    },
+    {
+      q: `What is the output of this nested loop?<pre>for (int i = 1; i &lt;= 3; i++) {
+  for (int j = 1; j &lt;= 3; j++) {
+    if (i == j) System.out.print(i*j + " ");
+  }
+}</pre>`,
+      a: `Only prints when i == j:<br>i=1,j=1 → 1×1=<strong>1</strong><br>i=2,j=2 → 2×2=<strong>4</strong><br>i=3,j=3 → 3×3=<strong>9</strong><br>Output: <strong>1 4 9</strong>`
+    },
+    {
+      q: `Write a while loop that computes the sum of all <b>odd</b> numbers from 1 to 99.`,
+      a: `<pre>int sum = 0, n = 1;
+while (n &lt;= 99) {
+  sum += n;
+  n += 2;
+}
+System.out.println(sum); // 2500</pre>The sum of odd numbers 1,3,5,...,99 = 50² = <strong>2500</strong>.`
+    },
+    {
+      q: `What is an <b>off-by-one error</b>? Given this loop, how many times does it actually run vs. intended?<pre>for (int i = 0; i &lt;= arr.length; i++) {
+  arr[i] *= 2;
+}</pre>`,
+      a: `An <strong>off-by-one error</strong> is when a loop runs one too many (or too few) times.<br>This loop runs <code>arr.length + 1</code> times, but the array only has indices <code>0</code> to <code>arr.length - 1</code>.<br>When <code>i == arr.length</code>, <code>arr[i]</code> throws an <code>ArrayIndexOutOfBoundsException</code>.<br>Fix: change <code>&lt;=</code> to <code>&lt;</code>.`
+    }
+  ],
+
+  // === RECURSION ===
+  [
+    {
+      q: `What are the two essential parts of any recursive method?`,
+      a: `1. <strong>Base case</strong>: a condition that stops the recursion and returns a value directly (no recursive call).<br>2. <strong>Recursive case</strong>: the part that calls the method with a <em>simpler</em> version of the problem, moving toward the base case.`
+    },
+    {
+      q: `What is the output of <code>System.out.println(fact(4))</code>?<pre>public static int fact(int n) {
+  if (n == 0) return 1;
+  return n * fact(n - 1);
+}</pre>`,
+      a: `fact(4) = 4 × fact(3) = 4 × 3 × fact(2) = 4 × 3 × 2 × fact(1) = 4 × 3 × 2 × 1 × fact(0) = 4×3×2×1×1 = <strong>24</strong>`
+    },
+    {
+      q: `What happens if a recursive method has no base case?`,
+      a: `The method will call itself <strong>infinitely</strong>, each call adding a new frame to the call stack, eventually causing a <code><strong>StackOverflowError</strong></code>.`
+    },
+    {
+      q: `What does this method return for <code>mystery(5)</code>?<pre>public static int mystery(int n) {
+  if (n &lt;= 1) return n;
+  return mystery(n-1) + mystery(n-2);
+}</pre>`,
+      a: `This computes the <strong>Fibonacci sequence</strong>.<br>mystery(5) = mystery(4) + mystery(3) = (mystery(3)+mystery(2)) + (mystery(2)+mystery(1))<br>= ((2+1)+(1+1)) + ((1+1)+1) = (3+2)+(2+1) = 5+3 = <strong>5</strong>`
+    },
+    {
+      q: `Write a recursive method <code>sumDigits(int n)</code> that returns the sum of digits of a non-negative integer.`,
+      a: `<pre>public static int sumDigits(int n) {
+  if (n &lt; 10) return n;        // base case
+  return (n % 10) + sumDigits(n / 10); // recursive
+}
+// sumDigits(453) = 3 + sumDigits(45)
+//                = 3 + 5 + sumDigits(4) = 12</pre>`
+    },
+    {
+      q: `What is <b>tail recursion</b>, and does Java optimize it? Rewrite this factorial as a tail-recursive version.`,
+      a: `<strong>Tail recursion</strong>: the recursive call is the <em>last</em> operation — no pending computation after it returns.<br><strong>Java does NOT</strong> optimize tail recursion (no TCO in the JVM).<br><pre>// Tail-recursive with accumulator
+public static int factTail(int n, int acc) {
+  if (n == 0) return acc;
+  return factTail(n - 1, n * acc);
+}
+// call: factTail(4, 1)</pre>`
+    }
+  ],
+
+  // === STRING & MATH CLASSES ===
+  [
+    {
+      q: `What does <code>Math.abs(-7)</code> return, and what does <code>Math.max(3, 9)</code> return?`,
+      a: `<code>Math.abs(-7)</code> returns <strong>7</strong> (absolute value).<br><code>Math.max(3, 9)</code> returns <strong>9</strong> (the larger of two values).`
+    },
+    {
+      q: `What does <code>"Hello".substring(1, 3)</code> return?`,
+      a: `<strong>"el"</strong><br><code>substring(beginIndex, endIndex)</code> returns characters from index <code>beginIndex</code> (inclusive) to <code>endIndex</code> (exclusive).<br>H(0) e(1) l(2) l(3) o(4) → indices 1,2 → "el"`
+    },
+    {
+      q: `Why should you use <code>.equals()</code> instead of <code>==</code> to compare Strings in Java?`,
+      a: `<code>==</code> checks <strong>reference equality</strong> (whether both variables point to the exact same object in memory).<br><code>.equals()</code> checks <strong>content equality</strong> (whether the characters are the same).<br>Two different String objects with the same text will fail <code>==</code> but pass <code>.equals()</code>.`
+    },
+    {
+      q: `What is the output?<pre>String s = "jeopardy";
+System.out.println(s.toUpperCase().indexOf("O"));
+System.out.println(s.length());</pre>`,
+      a: `<code>s.toUpperCase()</code> = "JEOPARDY"<br><code>indexOf("O")</code>: J(0)E(1)O(2) → <strong>2</strong><br><code>s.length()</code> = <strong>8</strong><br>Output:<br><code>2</code><br><code>8</code>`
+    },
+    {
+      q: `How do you generate a <b>random integer</b> between 1 and 10 (inclusive) using the Math class?`,
+      a: `<pre>int rand = (int)(Math.random() * 10) + 1;</pre><code>Math.random()</code> returns a double in [0.0, 1.0).<br>Multiply by 10 → [0.0, 10.0), cast to int → 0–9, add 1 → <strong>1–10</strong>.<br>General formula: <code>(int)(Math.random() * range) + min</code>`
+    },
+    {
+      q: `What is the output of the following, and why?<pre>String a = "Java";
+String b = a.concat(" Rocks");
+System.out.println(a);
+System.out.println(b);
+System.out.println(a.compareTo("Java"));</pre>`,
+      a: `Strings in Java are <strong>immutable</strong> — <code>concat</code> returns a new String, it does not modify <code>a</code>.<br><code>a</code> → <strong>Java</strong><br><code>b</code> → <strong>Java Rocks</strong><br><code>compareTo("Java")</code>: lexicographically equal → <strong>0</strong>`
+    }
+  ]
+];
+
+const POINT_VALUES = [100, 200, 300, 400, 500, 600];
+
+// State
+let scores = [0, 0, 0];
+let used = Array.from({length: 6}, () => Array(6).fill(false));
+let currentCell = null; // {cat, row}
+let selectedTeam = 0;
+
+function renderScoreboard() {
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = TEAMS.map((name, i) => `
+    <div class="team-score ${i === selectedTeam ? 'active' : ''}" onclick="selectTeam(${i})">
+      <div class="team-name">${name}</div>
+      <div class="score-value">$${scores[i]}</div>
+      ${i === selectedTeam ? '<div class="active-label">● Active</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function selectTeam(i) {
+  selectedTeam = i;
+  renderScoreboard();
+  // Update team buttons in modal if open
+  document.querySelectorAll('.team-btn').forEach((btn, idx) => {
+    btn.classList.toggle('selected', idx === selectedTeam);
+  });
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  // Category headers
+  CATEGORIES.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = 'cat-header';
+    div.textContent = cat;
+    board.appendChild(div);
+  });
+
+  // Cells: row 0 = 100pts, row 5 = 600pts
+  for (let row = 0; row < 6; row++) {
+    for (let cat = 0; cat < 6; cat++) {
+      const div = document.createElement('div');
+      div.className = 'cell' + (used[cat][row] ? ' used' : '');
+      div.innerHTML = `<span class="points">$${POINT_VALUES[row]}</span>`;
+      if (!used[cat][row]) {
+        div.addEventListener('click', () => openQuestion(cat, row));
+      }
+      board.appendChild(div);
+    }
+  }
+}
+
+function openQuestion(cat, row) {
+  currentCell = {cat, row};
+  const q = QUESTIONS[cat][row];
+
+  document.getElementById('modalCat').textContent = CATEGORIES[cat];
+  document.getElementById('modalPts').textContent = `$${POINT_VALUES[row]}`;
+  document.getElementById('modalQ').innerHTML = q.q;
+  document.getElementById('modalA').innerHTML = q.a;
+  document.getElementById('modalA').classList.remove('show');
+
+  // Team buttons
+  const tb = document.getElementById('teamBtns');
+  tb.innerHTML = TEAMS.map((name, i) => `
+    <button class="team-btn ${i === selectedTeam ? 'selected' : ''}" onclick="selectTeamModal(${i})">${name}</button>
+  `).join('');
+
+  document.getElementById('overlay').classList.add('show');
+}
+
+function selectTeamModal(i) {
+  selectedTeam = i;
+  document.querySelectorAll('.team-btn').forEach((btn, idx) => {
+    btn.classList.toggle('selected', idx === i);
+  });
+  renderScoreboard();
+}
+
+document.getElementById('revealBtn').addEventListener('click', () => {
+  document.getElementById('modalA').classList.add('show');
+});
+
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('btnSkip').addEventListener('click', closeModal);
+
+document.getElementById('btnCorrect').addEventListener('click', () => {
+  if (currentCell === null) return;
+  scores[selectedTeam] += POINT_VALUES[currentCell.row];
+  markUsed();
+});
+
+document.getElementById('btnWrong').addEventListener('click', () => {
+  if (currentCell === null) return;
+  scores[selectedTeam] -= POINT_VALUES[currentCell.row];
+  markUsed();
+});
+
+function markUsed() {
+  used[currentCell.cat][currentCell.row] = true;
+  closeModal();
+  renderScoreboard();
+  renderBoard();
+  checkWinner();
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+  currentCell = null;
+}
+
+function checkWinner() {
+  const allUsed = used.every(cat => cat.every(v => v));
+  if (!allUsed) return;
+  const maxScore = Math.max(...scores);
+  const winnerIdx = scores.indexOf(maxScore);
+  document.getElementById('winnerName').textContent = TEAMS[winnerIdx] + ' Wins!';
+  document.getElementById('winnerScore').textContent = `Final Score: $${maxScore}`;
+  document.getElementById('winnerOverlay').classList.add('show');
+}
+
+function resetGame() {
+  scores = [0, 0, 0];
+  used = Array.from({length: 6}, () => Array(6).fill(false));
+  selectedTeam = 0;
+  document.getElementById('winnerOverlay').classList.remove('show');
+  renderScoreboard();
+  renderBoard();
+}
+
+// Close modal on overlay click
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('overlay')) closeModal();
+});
+
+// Init
+renderScoreboard();
+renderBoard();
+</script>
+</body>
+</html>
