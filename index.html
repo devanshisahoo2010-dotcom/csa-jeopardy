@@ -498,6 +498,66 @@
 </head>
 <body>
 
+<!-- Setup Screen -->
+<div id="setupScreen" style="
+  position:fixed;inset:0;background:var(--navy);z-index:300;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  background-image:radial-gradient(ellipse at 20% 10%,rgba(30,79,160,0.3) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 90%,rgba(26,58,107,0.4) 0%,transparent 50%);
+">
+  <div style="
+    background:linear-gradient(145deg,var(--royal),var(--navy));
+    border:2px solid var(--mid);border-radius:20px;
+    padding:44px 48px;max-width:480px;width:100%;
+    box-shadow:0 0 60px rgba(59,130,246,0.2),0 30px 80px rgba(0,0,0,0.7);
+    text-align:center;
+  ">
+    <div style="font-size:2.8rem;margin-bottom:8px;">🎓</div>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:0.08em;color:var(--white);text-shadow:0 0 20px rgba(59,130,246,0.5);">AP <span style="color:var(--gold);">CSA</span> Jeopardy</h1>
+    <p style="font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;letter-spacing:0.2em;color:var(--sky);text-transform:uppercase;margin-bottom:32px;">Enter team names to begin</p>
+
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);min-width:28px;">1</span>
+        <input id="tname0" type="text" placeholder="Team 1 name" maxlength="20" style="
+          flex:1;background:rgba(10,22,40,0.7);border:1px solid var(--mid);
+          border-radius:8px;padding:11px 16px;color:var(--white);
+          font-family:'Barlow Condensed',sans-serif;font-size:1rem;
+          letter-spacing:0.05em;outline:none;transition:border-color 0.2s;
+        ">
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);min-width:28px;">2</span>
+        <input id="tname1" type="text" placeholder="Team 2 name" maxlength="20" style="
+          flex:1;background:rgba(10,22,40,0.7);border:1px solid var(--mid);
+          border-radius:8px;padding:11px 16px;color:var(--white);
+          font-family:'Barlow Condensed',sans-serif;font-size:1rem;
+          letter-spacing:0.05em;outline:none;transition:border-color 0.2s;
+        ">
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);min-width:28px;">3</span>
+        <input id="tname2" type="text" placeholder="Team 3 name" maxlength="20" style="
+          flex:1;background:rgba(10,22,40,0.7);border:1px solid var(--mid);
+          border-radius:8px;padding:11px 16px;color:var(--white);
+          font-family:'Barlow Condensed',sans-serif;font-size:1rem;
+          letter-spacing:0.05em;outline:none;transition:border-color 0.2s;
+        ">
+      </div>
+    </div>
+
+    <button onclick="startGame()" style="
+      background:linear-gradient(135deg,var(--mid),var(--bright));
+      border:none;color:white;padding:14px 48px;border-radius:10px;
+      cursor:pointer;font-family:'Barlow Condensed',sans-serif;
+      font-size:1.15rem;letter-spacing:0.12em;text-transform:uppercase;
+      font-weight:700;transition:all 0.2s;width:100%;
+    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      Start Game →
+    </button>
+  </div>
+</div>
+
 <header>
   <h1>AP <span>CSA</span> Jeopardy</h1>
   <p>Advanced Placement Computer Science A</p>
@@ -539,7 +599,7 @@
 </div>
 
 <script>
-const TEAMS = ['Team 1', 'Team 2', 'Team 3'];
+let TEAMS = ['Team 1', 'Team 2', 'Team 3'];
 
 const CATEGORIES = [
   'Sorting & Searching',
@@ -552,225 +612,313 @@ const CATEGORIES = [
 
 // 6 categories × 6 point values (100–600)
 const QUESTIONS = [
+
   // === SORTING & SEARCHING ===
   [
     {
-      q: `What is the time complexity of <b>linear search</b> in the worst case?`,
-      a: `<strong>O(n)</strong> — Linear search scans each element one by one, so in the worst case it checks all <em>n</em> elements.`
+      q: `In binary search, what must be updated when the target is <b>greater than</b> the middle element?`,
+      a: `Increase <code>low</code> to <code>mid + 1</code>. Since the target is larger, we discard the left half and search only the right half.`
     },
     {
-      q: `In <b>selection sort</b>, what operation is performed in each pass through the array?`,
-      a: `<strong>Find the minimum element</strong> in the unsorted portion and <strong>swap it</strong> into its correct position at the front.`
+      q: `Given this array and using <b>Selection Sort</b> (ascending), what does the array look like after the <b>second pass</b>?<pre>int[] nums = {77, 53, 28, 30, 19, 65};</pre>`,
+      a: `<strong>[19, 28, 53, 30, 77, 65]</strong><br>Pass 1: Find min (19) → swap with index 0 → [19, 53, 28, 30, 77, 65]<br>Pass 2: Find min of remaining (28) → swap with index 1 → [19, 28, 53, 30, 77, 65]`
     },
     {
-      q: `What precondition must be met before applying <b>binary search</b>?`,
-      a: `The array must be <strong>sorted in ascending (or descending) order</strong>. Binary search relies on eliminating half the search space at each step.`
+      q: `What condition causes a <b>binary search</b> to stop when the target is <b>NOT found</b>?`,
+      a: `The search stops when <code>low</code> becomes <strong>greater than</strong> <code>high</code>. At that point the search space is empty and the target does not exist in the array.`
     },
     {
-      q: `What is the worst-case time complexity of <b>insertion sort</b>, and when does it occur?`,
-      a: `<strong>O(n²)</strong> — occurs when the input array is in <strong>reverse sorted order</strong>, requiring maximum shifts at each step.`
+      q: `Given this array and using <b>Insertion Sort</b> (ascending), what does it look like after the <b>third pass</b>?<pre>String[] letters = {"p", "b", "D", "E", "y", "S"};</pre>`,
+      a: `<strong>["D", "E", "b", "p", "y", "S"]</strong><br>Note: In Java String comparison, uppercase letters come before lowercase.<br>Pass 1: insert "b" → ["b","p","D","E","y","S"]<br>Pass 2: insert "D" → ["D","b","p","E","y","S"]<br>Pass 3: insert "E" → ["D","E","b","p","y","S"]`
     },
     {
-      q: `Describe the <b>merge sort</b> algorithm at a high level and state its time complexity.`,
-      a: `Merge sort <strong>divides</strong> the array in half recursively until single elements remain, then <strong>merges</strong> sorted halves back together. Time complexity: <strong>O(n log n)</strong> in all cases.`
+      q: `After <b>3 passes of Selection Sort</b>, what is the array?<pre>int[] arr = {5, 2, 9, 1, 6};
+for (int i = 0; i &lt; 3; i++) {
+  int minIndex = i;
+  for (int j = i+1; j &lt; arr.length; j++)
+    if (arr[j] &lt; arr[minIndex]) minIndex = j;
+  int temp = arr[i];
+  arr[i] = arr[minIndex];
+  arr[minIndex] = temp;
+}</pre>`,
+      a: `<strong>[1, 2, 5, 9, 6]</strong><br>Pass 1: min=1 → swap with index 0 → [1,2,9,5,6] wait — min of {5,2,9,1,6}=1 at idx 3 → [1,2,9,5,6]... re-trace:<br>Pass 1: min=1(idx3)→swap→[1,2,9,5,6]<br>Pass 2: min of {2,9,5,6}=2(idx1)→no swap→[1,2,9,5,6]<br>Pass 3: min of {9,5,6}=5(idx3)→swap→[1,2,5,9,6]`
     },
     {
-      q: `Given a sorted array <code>[2, 5, 8, 12, 16, 23, 38, 56]</code>, trace through <b>binary search</b> looking for 23. List each mid index checked (0-based).`,
-      a: `Array length = 8.<br><strong>Step 1:</strong> low=0, high=7 → mid=3 → arr[3]=12 &lt; 23 → search right<br><strong>Step 2:</strong> low=4, high=7 → mid=5 → arr[5]=23 ✓ Found at index 5.<br>Mid indices checked: <strong>3, 5</strong>`
+      q: `What are <code>low</code>, <code>high</code>, and <code>mid</code> after <b>2 iterations</b> of this binary search?<pre>int[] arr = {1,3,5,7,9,11,13};
+int target = 7;
+int low = 0, high = arr.length - 1;
+for (int i = 0; i &lt; 2; i++) {
+  int mid = (low + high) / 2;
+  if (arr[mid] == target) break;
+  else if (arr[mid] &lt; target) low = mid + 1;
+  else high = mid - 1;
+  System.out.println(low+" "+high+" "+mid);
+}</pre>`,
+      a: `<strong>Iteration 1:</strong> low=0, high=6 → mid=3 → arr[3]=7 == target → break!<br>Wait — target IS found at iteration 1, so the loop breaks immediately.<br>Printed: nothing (break before println).<br>If target were not found at mid=3: Iteration 1 output: <strong>low=4, high=6, mid=3</strong>; Iteration 2: mid=5 → output: <strong>low=4, high=4, mid=5</strong>`
     }
   ],
 
   // === 2D ARRAYS & ARRAYLISTS ===
   [
     {
-      q: `How do you declare a 2D array in Java with 3 rows and 4 columns of integers?`,
-      a: `<code>int[][] arr = new int[3][4];</code><br>This creates a 2D array with 3 rows and 4 columns, initialized to 0.`
+      q: `What is the output of the following code?<pre>int[][] grid = { {9,2}, {15,3}, {6,22} };
+int sum = 0;
+for (int r = 0; r &lt; grid.length; r++)
+  for (int c = 0; c &lt; grid[0].length; c++)
+    if (grid[r][c] % 2 == 0) sum += grid[r][c];
+System.out.println(sum);</pre>`,
+      a: `Adds only even numbers: 2 + 6 + 22 = <strong>30</strong><br>9 (odd, skip), 2 ✓, 15 (odd, skip), 3 (odd, skip), 6 ✓, 22 ✓`
     },
     {
-      q: `What method adds an element to the <b>end</b> of an ArrayList, and what method retrieves an element by index?`,
-      a: `<strong>Add:</strong> <code>list.add(element)</code><br><strong>Get:</strong> <code>list.get(index)</code>`
+      q: `What is printed?<pre>int[][] grid = {{2,4,6},{1,3,5},{7,8,9}};
+int count = 0;
+for (int r = 0; r &lt; grid.length; r++)
+  for (int c = 0; c &lt; grid[0].length; c++)
+    if (r == c) count += grid[r][c];
+System.out.println(count);</pre>`,
+      a: `Only sums diagonal elements where <code>r == c</code>:<br>grid[0][0]=2, grid[1][1]=3, grid[2][2]=9 → 2+3+9 = <strong>14</strong>`
     },
     {
-      q: `What is the output of the following code?<pre>int[][] m = {{1,2},{3,4},{5,6}};
-System.out.println(m.length + " " + m[0].length);</pre>`,
-      a: `<strong>3 2</strong><br><code>m.length</code> = number of rows = 3<br><code>m[0].length</code> = number of columns = 2`
+      q: `What is printed?<pre>ArrayList&lt;Integer&gt; list =
+  new ArrayList&lt;&gt;(Arrays.asList(1,2,3,4,5));
+for (int i = 0; i &lt; list.size(); i++) {
+  if (list.get(i) % 2 == 1)
+    list.set(i, list.get(i) * 2);
+}
+System.out.println(list);</pre>`,
+      a: `Odd numbers (1, 3, 5) get doubled; even numbers stay the same.<br>1→2, 2 stays, 3→6, 4 stays, 5→10<br>Result: <strong>[2, 2, 6, 4, 10]</strong>`
     },
     {
-      q: `Explain why you <b>cannot</b> use a standard for-each loop to modify elements of an ArrayList during iteration, and what should be used instead.`,
-      a: `A for-each loop provides a <strong>copy</strong> of each element — modifying the loop variable doesn't affect the list. Also, <strong>removing</strong> elements during for-each throws <code>ConcurrentModificationException</code>.<br>Use an <strong>index-based for loop iterating backwards</strong>, or <code>Iterator.remove()</code>.`
+      q: `What is the output?<pre>ArrayList&lt;Integer&gt; numList = new ArrayList&lt;&gt;();
+numList.add(3);   // [3]
+numList.add(2);   // [3,2]
+numList.add(1);   // [3,2,1]
+numList.add(1, 0); // insert 0 at idx 1
+numList.set(0, 2); // replace idx 0 with 2
+numList.remove(2); // remove element at idx 2
+numList.add(1, 5); // insert 5 at idx 1
+numList.set(numList.size()-1, 4);
+System.out.print(numList);</pre>`,
+      a: `Step by step:<br>[3] → [3,2] → [3,2,1] → [3,0,2,1] → [2,0,2,1] → [2,0,1] → [2,5,0,1] → [2,5,0,<strong>4</strong>]<br>Answer: <strong>[2, 5, 0, 4]</strong>`
     },
     {
-      q: `Write a method that sums all elements in a 2D int array.`,
-      a: `<pre>public int sum2D(int[][] arr) {
-  int total = 0;
-  for (int[] row : arr)
-    for (int val : row)
-      total += val;
-  return total;
-}</pre>`
+      q: `This code is meant to remove all even values from the ArrayList, but it doesn't work as intended. Why?<pre>ArrayList&lt;Integer&gt; numbers =
+  new ArrayList&lt;&gt;(Arrays.asList(2,4,6,7,8,9,10));
+for (int i = 0; i &lt; numbers.size(); i++) {
+  if (numbers.get(i) % 2 == 0)
+    numbers.remove(i);
+}
+System.out.println("Result: " + numbers);</pre>`,
+      a: `<strong>Problem:</strong> When an element is removed, all subsequent elements shift left by one index. The loop then increments <code>i</code>, causing it to <strong>skip the element that shifted into the removed element's position</strong>.<br>Fix: iterate backwards (<code>i--</code> after removing), or use an Iterator.`
     },
     {
-      q: `An ArrayList contains <code>[10, 20, 30, 40, 50]</code>. What is the state of the list after:<pre>list.remove(1);
-list.add(1, 99);
-list.set(3, 77);</pre>`,
-      a: `<strong>Step 1</strong> <code>remove(1)</code>: removes index 1 → <code>[10, 30, 40, 50]</code><br><strong>Step 2</strong> <code>add(1, 99)</code>: inserts 99 at index 1 → <code>[10, 99, 30, 40, 50]</code><br><strong>Step 3</strong> <code>set(3, 77)</code>: replaces index 3 → <code>[10, 99, 30, <b>77</b>, 50]</code>`
+      q: `What is the result of executing this code?<pre>ArrayList&lt;Integer&gt; nums =
+  new ArrayList&lt;&gt;(Arrays.asList(2,4,6,8,10));
+for (int i = 0; i &lt; nums.size(); i++) {
+  if (nums.get(i) % 4 == 0) {
+    nums.remove(i);
+  } else {
+    nums.set(i, nums.get(i) + nums.get(i-1));
+  }
+}
+System.out.println(nums);</pre>`,
+      a: `<strong>Runtime error: IndexOutOfBoundsException</strong><br>When i=0 and nums.get(0)=2 (not divisible by 4), the else branch tries <code>nums.get(i-1)</code> = <code>nums.get(-1)</code>, which throws an IndexOutOfBoundsException.`
     }
   ],
 
   // === METHODS & CONTROL STRUCTURES ===
   [
     {
-      q: `What is the difference between a <b>void</b> method and a method with a <b>return type</b>?`,
-      a: `A <strong>void</strong> method performs actions but does <strong>not return a value</strong>. A method with a return type (e.g., <code>int</code>, <code>String</code>) computes and <strong>returns a value</strong> to the caller using the <code>return</code> keyword.`
+      q: `Consider the <code>Shoe</code> class. Which best describes the error?<pre>public class Shoe {
+  int shoe_type;
+  String brandName;
+  int price;
+  int color;
+  //other methods not included
+}</pre>`,
+      a: `<strong>The attributes <code>shoe_type</code> and <code>color</code> must be declared as type <code>String</code>, and <code>price</code> must be declared as <code>double</code>.</strong><br>Shoe type and color are descriptive labels (not numbers), and price should support decimal values.`
     },
     {
-      q: `What is the output?<pre>int x = 7;
-if (x > 10)
-  System.out.println("A");
-else if (x > 5)
-  System.out.println("B");
-else
-  System.out.println("C");</pre>`,
-      a: `<strong>B</strong><br>7 is not &gt; 10, but 7 <em>is</em> &gt; 5, so the second branch executes.`
+      q: `Consider the <code>StringThing</code> class. What is printed when <code>main</code> runs?<pre>String str = "hamburger";
+String result = method1(str); // removes vowels
+System.out.println(str + " " + result);</pre>(method1 removes all vowels from the string)`,
+      a: `<strong>hamburger hmbrgr</strong><br>method1 builds a new string keeping only consonants (characters not in "aeiou"). The original <code>str</code> is unchanged (Strings are immutable). Result has all vowels removed: h-m-b-r-g-r.`
     },
     {
-      q: `What is <b>method overloading</b>? Give an example signature pair.`,
-      a: `Method overloading = same method name, <strong>different parameter lists</strong> (different types or count).<br>Example:<br><code>int add(int a, int b)</code><br><code>double add(double a, double b)</code><br>Java selects the correct version based on argument types at compile time.`
+      q: `What is the output of the following code?<pre>Dog myDog = new Dog("Molly");
+System.out.println(myDog.bark());</pre>Given: <code>bark()</code> returns <code>name + " says woof!"</code>`,
+      a: `<strong>Molly says woof!</strong><br>The Dog constructor sets <code>name = "Molly"</code>. Calling <code>bark()</code> returns <code>"Molly" + " says woof!"</code> which is then printed.`
     },
     {
-      q: `Explain the difference between <b>pass by value</b> for primitives vs. object references in Java method calls.`,
-      a: `Java always passes by <strong>value</strong>.<br>• <strong>Primitives</strong>: a copy of the value is passed; changes inside the method don't affect the original.<br>• <strong>Object references</strong>: a copy of the <em>reference</em> (address) is passed; the method can mutate the object's fields, but cannot change which object the caller's variable points to.`
+      q: `Write a constructor for the <code>GolfBag</code> class that initializes all instance variables. <code>color</code> = <code>false</code> if <code>col</code> is "BLACK" or "WHITE", <code>true</code> otherwise.`,
+      a: `<pre>public GolfBag(String name, Equipment equip, String col) {
+  golferName = name;
+  equipment = equip;
+  if (col.equals("BLACK") || col.equals("WHITE"))
+    color = false;
+  else
+    color = true;
+}</pre>`
     },
     {
-      q: `What does <code>static</code> mean on a method, and how is it called differently than an instance method?`,
-      a: `A <code>static</code> method belongs to the <strong>class</strong>, not an instance. It can be called without creating an object:<br><code>ClassName.methodName()</code><br>vs. an instance method which requires an object:<br><code>obj.methodName()</code><br>Static methods cannot access instance variables directly.`
+      q: `Consider this code. What is the result when compiled and run, and what fix is needed?<pre>public class Toy {
+  private String name;
+  public void setName(String newName) { name = newName; }
+  public void printName() {
+    System.out.println("Name: " + newName); // bug
+  }
+}</pre>`,
+      a: `<strong>The code will NOT compile</strong> because <code>newName</code> is undefined inside <code>printName()</code>. It is a parameter of <code>setName()</code>, not accessible in <code>printName()</code>.<br>Fix: change <code>newName</code> to <code>name</code> in the println.`
     },
     {
-      q: `What is the output of this program?<pre>public static int mystery(int n) {
-  if (n == 0) return 0;
-  return (n % 2) + 10 * mystery(n / 2);
-}
-System.out.println(mystery(13));</pre>`,
-      a: `This converts 13 to binary:<br>13 / 2 = 6 r <strong>1</strong><br>6 / 2 = 3 r <strong>0</strong><br>3 / 2 = 1 r <strong>1</strong><br>1 / 2 = 0 r <strong>1</strong><br>Result: <code>10 * mystery(6) + 1</code> → builds up: <strong>1101</strong><br>Output: <strong>1101</strong>`
+      q: `Which statements are true for this code segment?<pre>public class Sport {
+  public void playGames() { /*code*/ }
+  public static void main(String[] args) {
+    Sport game = null;
+    game.playGames();
+    System.out.println("I played games");
+  }
+}</pre>I. Prints "I played games" &nbsp; II. Throws NullPointerException &nbsp; III. Runs without error &nbsp; IV. Null reference calling playGames() causes error &nbsp; V. game can't point to null`,
+      a: `<strong>II and IV</strong><br><code>game</code> is <code>null</code>, so calling <code>game.playGames()</code> throws a <code>NullPointerException</code> at runtime. The null reference itself is valid Java syntax (V is false), but invoking a method on null causes an error (IV is true). The print statement is never reached (I is false).`
     }
   ],
 
   // === LOOPS ===
   [
     {
-      q: `What is the difference between a <b>while</b> loop and a <b>do-while</b> loop?`,
-      a: `A <code>while</code> loop checks the condition <strong>before</strong> each iteration — it may execute <strong>zero times</strong>.<br>A <code>do-while</code> loop checks the condition <strong>after</strong> each iteration — it always executes <strong>at least once</strong>.`
+      q: `What does the following code segment output?<pre>int x = 5 + 7 % 2;
+if (x &gt;= 6) { x = x + 3; }
+x = x + 2;
+System.out.println(x);</pre>`,
+      a: `<strong>11</strong><br><code>7 % 2 = 1</code>, so <code>x = 5 + 1 = 6</code>.<br>Since 6 &gt;= 6 is true: <code>x = 6 + 3 = 9</code>.<br>Then <code>x = 9 + 2 = 11</code>.`
     },
     {
-      q: `How many times does this loop execute?<pre>for (int i = 0; i &lt; 5; i += 2) {
-  System.out.print(i + " ");
+      q: `What does the following code output?<pre>String item = "dessert";
+int numberchoice = 2;
+if (item.equals("dessert"))
+  System.out.println("Making a traditional dessert.");
+numberchoice = numberchoice + (item.length() % 6);
+if (numberchoice == 2)
+  System.out.println("Add chocolate chips.");
+System.out.println("Cooking for 30 minutes.");</pre>`,
+      a: `<strong>Making a traditional dessert.</strong><br><strong>Cooking for 30 Minutes.</strong><br><code>item.length()=7</code>, <code>7%6=1</code>, so <code>numberchoice=2+1=3</code>. Since 3≠2, "Add chocolate chips." is NOT printed. The final println always runs.`
+    },
+    {
+      q: `What does the boolean expression evaluate to?<pre>true || false &amp;&amp; !false &amp;&amp; (false || true)</pre>`,
+      a: `<strong>true</strong><br>Operator precedence: <code>&amp;&amp;</code> binds tighter than <code>||</code>.<br>Evaluate right side first: <code>false &amp;&amp; !false &amp;&amp; (true)</code> = <code>false &amp;&amp; true &amp;&amp; true</code> = <code>false</code>.<br>Then: <code>true || false</code> = <strong>true</strong>.`
+    },
+    {
+      q: `What does calling <code>pattern()</code> output?<pre>public static void pattern() {
+  for (int i = 1; i &lt;= 3; i++)
+    System.out.print("//"+i+""+(2*i)+""+(3*i)+"\\\\\\n");
 }</pre>`,
-      a: `<strong>3 times</strong> — printing <code>0 2 4</code><br>i = 0 (0 &lt; 5 ✓), i = 2 (2 &lt; 5 ✓), i = 4 (4 &lt; 5 ✓), i = 6 (6 &lt; 5 ✗) → stop`
+      a: `<pre>//123\\
+//246\\
+//369\\</pre>Each iteration i=1,2,3 prints: <code>"//"</code> + i + (2×i) + (3×i) + <code>"\\"</code> then a newline.`
     },
     {
-      q: `What is the difference between <code>break</code> and <code>continue</code> inside a loop?`,
-      a: `<code><strong>break</strong></code>: immediately <strong>exits</strong> the loop entirely.<br><code><strong>continue</strong></code>: skips the rest of the current iteration and moves to the <strong>next iteration</strong> (re-evaluating the condition).`
-    },
-    {
-      q: `What is the output of this nested loop?<pre>for (int i = 1; i &lt;= 3; i++) {
-  for (int j = 1; j &lt;= 3; j++) {
-    if (i == j) System.out.print(i*j + " ");
+      q: `What is the value of <code>sum</code> if you call <code>calcSum(10, 9, 40)</code>?<pre>public static int calcSum(int start, int increment, int end){
+  int sum = start, count = 0;
+  while (sum &lt; end) {
+    sum += increment;
+    if (sum % 2 == 0) { sum += 1; count++; }
   }
+  return sum;
 }</pre>`,
-      a: `Only prints when i == j:<br>i=1,j=1 → 1×1=<strong>1</strong><br>i=2,j=2 → 2×2=<strong>4</strong><br>i=3,j=3 → 3×3=<strong>9</strong><br>Output: <strong>1 4 9</strong>`
+      a: `<strong>49</strong><br>sum=10. Loop: sum=10+9=19(odd,skip)→28(even→29)→38(even→39)→48(even→49). Now 49≥40 so loop exits. Return <strong>49</strong>.`
     },
     {
-      q: `Write a while loop that computes the sum of all <b>odd</b> numbers from 1 to 99.`,
-      a: `<pre>int sum = 0, n = 1;
-while (n &lt;= 99) {
-  sum += n;
-  n += 2;
-}
-System.out.println(sum); // 2500</pre>The sum of odd numbers 1,3,5,...,99 = 50² = <strong>2500</strong>.`
-    },
-    {
-      q: `What is an <b>off-by-one error</b>? Given this loop, how many times does it actually run vs. intended?<pre>for (int i = 0; i &lt;= arr.length; i++) {
-  arr[i] *= 2;
+      q: `Calling <code>drawGrid(20)</code> will result in a grid of circles containing how many rows and columns?<pre>public static void drawGrid(int x) {
+  for (int i = 0; i &lt; x; i++)
+    drawCircle(30+(i%6)*20, 30+(i/6)*20);
 }</pre>`,
-      a: `An <strong>off-by-one error</strong> is when a loop runs one too many (or too few) times.<br>This loop runs <code>arr.length + 1</code> times, but the array only has indices <code>0</code> to <code>arr.length - 1</code>.<br>When <code>i == arr.length</code>, <code>arr[i]</code> throws an <code>ArrayIndexOutOfBoundsException</code>.<br>Fix: change <code>&lt;=</code> to <code>&lt;</code>.`
+      a: `<strong>Three rows of six circles, and one more row of two circles</strong> (20 total).<br><code>i%6</code> cycles columns 0–5 (6 per row). <code>i/6</code> gives row number (integer division). For i=0..17: 3 complete rows of 6. For i=18,19: a 4th row with 2 circles.`
     }
   ],
 
   // === RECURSION ===
   [
     {
-      q: `What are the two essential parts of any recursive method?`,
-      a: `1. <strong>Base case</strong>: a condition that stops the recursion and returns a value directly (no recursive call).<br>2. <strong>Recursive case</strong>: the part that calls the method with a <em>simpler</em> version of the problem, moving toward the base case.`
+      q: `What is the difference between <b>linear</b> and <b>non-linear</b> recursion?`,
+      a: `<strong>Linear recursion:</strong> the method makes exactly <strong>one</strong> recursive call per invocation (runs once before reaching the base case).<br><strong>Non-linear recursion:</strong> the method makes <strong>two or more</strong> recursive calls per invocation (e.g., Fibonacci). This creates a tree of calls.`
     },
     {
-      q: `What is the output of <code>System.out.println(fact(4))</code>?<pre>public static int fact(int n) {
-  if (n == 0) return 1;
-  return n * fact(n - 1);
+      q: `What value is returned by <code>fun2(16)</code>?<pre>public int fun2(int n) {
+  if (n == 1) return 0;
+  else return 1 + fun2(n/2);
 }</pre>`,
-      a: `fact(4) = 4 × fact(3) = 4 × 3 × fact(2) = 4 × 3 × 2 × fact(1) = 4 × 3 × 2 × 1 × fact(0) = 4×3×2×1×1 = <strong>24</strong>`
+      a: `<strong>4</strong><br>fun2(16)=1+fun2(8)=1+1+fun2(4)=1+1+1+fun2(2)=1+1+1+1+fun2(1)=1+1+1+1+0 = <strong>4</strong><br>This counts how many times you can divide 16 by 2 before reaching 1 (i.e., log₂16 = 4).`
     },
     {
-      q: `What happens if a recursive method has no base case?`,
-      a: `The method will call itself <strong>infinitely</strong>, each call adding a new frame to the call stack, eventually causing a <code><strong>StackOverflowError</strong></code>.`
-    },
-    {
-      q: `What does this method return for <code>mystery(5)</code>?<pre>public static int mystery(int n) {
-  if (n &lt;= 1) return n;
-  return mystery(n-1) + mystery(n-2);
+      q: `What value is returned by <code>foo(3)</code>?<pre>public int foo(int n) {
+  if (n &lt; 0) return 1;
+  else return foo(n-2) + foo(n-1);
 }</pre>`,
-      a: `This computes the <strong>Fibonacci sequence</strong>.<br>mystery(5) = mystery(4) + mystery(3) = (mystery(3)+mystery(2)) + (mystery(2)+mystery(1))<br>= ((2+1)+(1+1)) + ((1+1)+1) = (3+2)+(2+1) = 5+3 = <strong>5</strong>`
+      a: `<strong>8</strong><br>foo(3) = foo(1)+foo(2)<br>foo(1) = foo(-1)+foo(0) = 1 + (foo(-2)+foo(-1)) = 1+1+1 = 3<br>foo(2) = foo(0)+foo(1) = (1+1+1)+3 = 2+3 = 5<br>foo(3) = 3+5 = <strong>8</strong>`
     },
     {
-      q: `Write a recursive method <code>sumDigits(int n)</code> that returns the sum of digits of a non-negative integer.`,
-      a: `<pre>public static int sumDigits(int n) {
-  if (n &lt; 10) return n;        // base case
-  return (n % 10) + sumDigits(n / 10); // recursive
-}
-// sumDigits(453) = 3 + sumDigits(45)
-//                = 3 + 5 + sumDigits(4) = 12</pre>`
+      q: `What do you get from the call <code>fun(13)</code>?<pre>public static int fun(int n) {
+  if (n &gt; 100) return n - 10;
+  else return fun(fun(n + 11));
+}</pre>`,
+      a: `<strong>91</strong><br>This is the classic McCarthy 91 function. For any n ≤ 100, it always returns 91. Trace: fun(13)→fun(fun(24))→fun(fun(fun(35)))→...eventually all inner calls reach n&gt;100, each returning n-10, and the chain resolves to <strong>91</strong>.`
     },
     {
-      q: `What is <b>tail recursion</b>, and does Java optimize it? Rewrite this factorial as a tail-recursive version.`,
-      a: `<strong>Tail recursion</strong>: the recursive call is the <em>last</em> operation — no pending computation after it returns.<br><strong>Java does NOT</strong> optimize tail recursion (no TCO in the JVM).<br><pre>// Tail-recursive with accumulator
-public static int factTail(int n, int acc) {
-  if (n == 0) return acc;
-  return factTail(n - 1, n * acc);
-}
-// call: factTail(4, 1)</pre>`
+      q: `What will the call <code>fun(13)</code> return?<pre>public static int fun(int i) {
+  if (i % 2 == 0) return (i += 2);
+  else return fun(fun(i - 1));
+}</pre>`,
+      a: `<strong>16</strong><br>fun(13): 13 is odd → fun(fun(12))<br>fun(12): 12 is even → 12+2 = 14<br>Now fun(14): 14 is even → 14+2 = <strong>16</strong>`
+    },
+    {
+      q: `What is the returned value of <code>mystery(9, 4, 2)</code>?<pre>public static int mystery(int x, int y, int z) {
+  if (x &gt; z)
+    return x + (y%2) + mystery(x-z, y-1, z+1);
+  else
+    return x * y * z;
+}</pre>`,
+      a: `<strong>49</strong><br>Call 1: x=9>z=2 → 9+(4%2)+mystery(7,3,3) = 9+0+mystery(7,3,3)<br>Call 2: x=7>z=3 → 7+(3%2)+mystery(4,2,4) = 7+1+mystery(4,2,4)<br>Call 3: x=4, z=4 → x not > z → 4×2×4 = 32<br>Total: 9+0+(7+1+32) = 9+40 = <strong>49</strong>`
     }
   ],
 
   // === STRING & MATH CLASSES ===
   [
     {
-      q: `What does <code>Math.abs(-7)</code> return, and what does <code>Math.max(3, 9)</code> return?`,
-      a: `<code>Math.abs(-7)</code> returns <strong>7</strong> (absolute value).<br><code>Math.max(3, 9)</code> returns <strong>9</strong> (the larger of two values).`
+      q: `What can replace <code>/* missing code */</code> so <code>almostEqual</code> works correctly?<pre>public static boolean almostEqual(
+    double d1, double d2, double tolerance) {
+  /* missing code */;
+}
+// almostEqual(7.9, 7.8, 0.15) → true
+// almostEqual(54.124, 54.126, 0.001) → false</pre>`,
+      a: `<code>return Math.abs(d1 - d2) &lt;= tolerance;</code><br><code>Math.abs()</code> gives the absolute distance between d1 and d2. If that distance is within tolerance, return true.`
     },
     {
-      q: `What does <code>"Hello".substring(1, 3)</code> return?`,
-      a: `<strong>"el"</strong><br><code>substring(beginIndex, endIndex)</code> returns characters from index <code>beginIndex</code> (inclusive) to <code>endIndex</code> (exclusive).<br>H(0) e(1) l(2) l(3) o(4) → indices 1,2 → "el"`
+      q: `This code removes the first "a" from <code>word</code>. Under what condition does it produce a <b>runtime error</b>?<pre>int aLoc = word.indexOf("a");
+String newWord = word.substring(0, aLoc)
+               + word.substring(aLoc + 1);</pre>`,
+      a: `<strong>When <code>word</code> does not contain the character "a".</strong><br><code>indexOf("a")</code> returns <code>-1</code> when "a" is not found. Then <code>substring(0, -1)</code> throws a <code>StringIndexOutOfBoundsException</code>.`
     },
     {
-      q: `Why should you use <code>.equals()</code> instead of <code>==</code> to compare Strings in Java?`,
-      a: `<code>==</code> checks <strong>reference equality</strong> (whether both variables point to the exact same object in memory).<br><code>.equals()</code> checks <strong>content equality</strong> (whether the characters are the same).<br>Two different String objects with the same text will fail <code>==</code> but pass <code>.equals()</code>.`
+      q: `What can replace <code>/*code*/</code> to assign a random integer between <code>min</code> and <code>max</code> inclusive?<pre>double rn = Math.random();
+int num = /*code*/;</pre>`,
+      a: `<code>(int)(rn * (max - min + 1)) + min</code><br><code>Math.random()</code> gives [0.0,1.0). Multiplying by <code>(max-min+1)</code> gives [0, range). Casting to int gives 0 to range-1. Adding <code>min</code> shifts to [min, max].`
     },
     {
-      q: `What is the output?<pre>String s = "jeopardy";
-System.out.println(s.toUpperCase().indexOf("O"));
-System.out.println(s.length());</pre>`,
-      a: `<code>s.toUpperCase()</code> = "JEOPARDY"<br><code>indexOf("O")</code>: J(0)E(1)O(2) → <strong>2</strong><br><code>s.length()</code> = <strong>8</strong><br>Output:<br><code>2</code><br><code>8</code>`
+      q: `What can replace <code>/*code*/</code> so this outputs <code>"pun"</code>?<pre>String one = "computer";
+String two = "science";
+String concat = /*code*/;
+System.out.println(concat);</pre>`,
+      a: `<code>one.substring(3, 5) + two.substring(4, 5)</code><br>"computer".substring(3,5) = "pu" (indices 3,4)<br>"science".substring(4,5) = "n" (index 4)<br>Result: "pu" + "n" = <strong>"pun"</strong>`
     },
     {
-      q: `How do you generate a <b>random integer</b> between 1 and 10 (inclusive) using the Math class?`,
-      a: `<pre>int rand = (int)(Math.random() * 10) + 1;</pre><code>Math.random()</code> returns a double in [0.0, 1.0).<br>Multiply by 10 → [0.0, 10.0), cast to int → 0–9, add 1 → <strong>1–10</strong>.<br>General formula: <code>(int)(Math.random() * range) + min</code>`
+      q: `What is the best approximate value of <code>answer</code>?<pre>double randNum = Math.random();
+double answer = (int)(Math.pow((int)randNum*10, 2))
+              - Math.sqrt(Math.pow(randNum, 2));</pre>`,
+      a: `<strong>The negative of the value stored in <code>randNum</code></strong>.<br><code>Math.random()</code> returns [0.0,1.0), so <code>(int)randNum = 0</code>.<br>Thus <code>(int)(Math.pow(0,2)) = 0</code>.<br><code>Math.sqrt(Math.pow(randNum,2)) = Math.sqrt(randNum²) = randNum</code>.<br>So <code>answer = 0 - randNum = -randNum</code>.`
     },
     {
-      q: `What is the output of the following, and why?<pre>String a = "Java";
-String b = a.concat(" Rocks");
-System.out.println(a);
-System.out.println(b);
-System.out.println(a.compareTo("Java"));</pre>`,
-      a: `Strings in Java are <strong>immutable</strong> — <code>concat</code> returns a new String, it does not modify <code>a</code>.<br><code>a</code> → <strong>Java</strong><br><code>b</code> → <strong>Java Rocks</strong><br><code>compareTo("Java")</code>: lexicographically equal → <strong>0</strong>`
+      q: `<code>Math.random()</code> returns a value in [0.0, 1.0). Write an expression using <code>Math.random()</code> and <code>Math.pow()</code> to generate a random integer from <b>1 to 100</b> inclusive, then explain what <code>Math.pow(2,10)</code> returns and its type.`,
+      a: `Random 1–100: <code>(int)(Math.random() * 100) + 1</code><br><code>Math.pow(2, 10)</code> returns <strong>1024.0</strong> — it always returns a <code>double</code>, even if the result is a whole number. To get an <code>int</code> you'd cast: <code>(int)Math.pow(2, 10)</code>.`
     }
   ]
 ];
@@ -903,8 +1051,12 @@ function resetGame() {
   used = Array.from({length: 6}, () => Array(6).fill(false));
   selectedTeam = 0;
   document.getElementById('winnerOverlay').classList.remove('show');
-  renderScoreboard();
-  renderBoard();
+  // Reset inputs and show setup screen again
+  document.getElementById('tname0').value = '';
+  document.getElementById('tname1').value = '';
+  document.getElementById('tname2').value = '';
+  document.getElementById('setupScreen').style.display = 'flex';
+  setTimeout(() => document.getElementById('tname0').focus(), 100);
 }
 
 // Close modal on overlay click
@@ -912,9 +1064,27 @@ document.getElementById('overlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('overlay')) closeModal();
 });
 
-// Init
-renderScoreboard();
-renderBoard();
+function startGame() {
+  const inputs = [
+    document.getElementById('tname0').value.trim(),
+    document.getElementById('tname1').value.trim(),
+    document.getElementById('tname2').value.trim(),
+  ];
+  TEAMS[0] = inputs[0] || 'Team 1';
+  TEAMS[1] = inputs[1] || 'Team 2';
+  TEAMS[2] = inputs[2] || 'Team 3';
+  document.getElementById('setupScreen').style.display = 'none';
+  renderScoreboard();
+  renderBoard();
+}
+
+// Focus first input on load, allow Enter to advance
+document.getElementById('tname0').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('tname1').focus(); });
+document.getElementById('tname1').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('tname2').focus(); });
+document.getElementById('tname2').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
+document.getElementById('tname0').focus();
+
+
 </script>
 </body>
 </html>
